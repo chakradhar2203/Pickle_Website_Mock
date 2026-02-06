@@ -125,13 +125,13 @@ export default function Home() {
                             <h3 className="text-3xl font-bold text-gray-900">A Culinary Heritage</h3>
                             <p className="text-lg text-gray-700 leading-relaxed">
                                 In the heart of Andhra Pradesh, where the sun blazes fierce and the soil runs rich with spice,
-                                Avakai is more than just a pickle—it's a ritual passed down through generations. Made from raw,
+                                Avakai is more than just a pickle—it&apos;s a ritual passed down through generations. Made from raw,
                                 unripe mangoes cut at their peak tartness, this legendary condiment embodies the bold spirit of
                                 Telugu cuisine.
                             </p>
                             <p className="text-lg text-gray-700 leading-relaxed">
-                                The word "Avakai" itself comes from the Telugu words <span className="font-semibold text-chili">avakaya</span>,
-                                meaning "that which is mixed." But this humble description belies the complexity within each jar—a
+                                The word &quot;Avakai&quot; itself comes from the Telugu words <span className="font-semibold text-chili">avakaya</span>,
+                                meaning &quot;that which is mixed.&quot; But this humble description belies the complexity within each jar—a
                                 symphony of fire, tang, and umami that awakens every sense.
                             </p>
                         </motion.div>
@@ -154,8 +154,8 @@ export default function Home() {
                         className="bg-gradient-to-br from-chili/10 to-turmeric/10 rounded-3xl p-10 text-center border-2 border-chili/20"
                     >
                         <p className="text-2xl md:text-3xl font-light text-gray-800 italic leading-relaxed">
-                            "Every spoonful of Avakai tells the story of Andhra—where tradition meets fearless flavor,
-                            and every meal becomes a celebration."
+                            &quot;Every spoonful of Avakai tells the story of Andhra—where tradition meets fearless flavor,
+                            and every meal becomes a celebration.&quot;
                         </p>
                     </motion.div>
                 </div>
