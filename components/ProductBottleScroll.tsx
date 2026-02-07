@@ -15,6 +15,7 @@ export default function ProductBottleScroll({
     const containerRef = useRef<HTMLDivElement>(null);
     const [images, setImages] = useState<HTMLImageElement[]>([]);
     const [imagesLoaded, setImagesLoaded] = useState(false);
+    const lastFrameRef = useRef(-1); // Cache last rendered frame
 
     // Preload all images
     useEffect(() => {
@@ -39,6 +40,32 @@ export default function ProductBottleScroll({
         setImages(loadedImages);
     }, [totalFrames, folderPath]);
 
+    // Handle canvas sizing on resize only (NOT on scroll)
+    useEffect(() => {
+        if (!imagesLoaded || !canvasRef.current) return;
+
+        const canvas = canvasRef.current;
+        const ctx = canvas.getContext("2d");
+        if (!ctx) return;
+
+        const updateCanvasSize = () => {
+            const scale = window.devicePixelRatio || 1;
+            canvas.width = window.innerWidth * scale;
+            canvas.height = window.innerHeight * scale;
+            ctx.scale(scale, scale);
+
+            // Re-render current frame after resize
+            lastFrameRef.current = -1; // Force re-render
+        };
+
+        // Initial sizing
+        updateCanvasSize();
+
+        // Only update on window resize, not scroll
+        window.addEventListener("resize", updateCanvasSize);
+        return () => window.removeEventListener("resize", updateCanvasSize);
+    }, [imagesLoaded]);
+
     // Handle scroll-based frame rendering
     useEffect(() => {
         if (!imagesLoaded || !canvasRef.current || !containerRef.current) return;
@@ -48,6 +75,10 @@ export default function ProductBottleScroll({
         const container = containerRef.current;
 
         if (!ctx) return;
+
+        // Cache canvas dimensions to avoid repeated lookups
+        let canvasWidth = window.innerWidth;
+        let canvasHeight = window.innerHeight;
 
         const render = () => {
             const rect = container.getBoundingClientRect();
@@ -61,14 +92,12 @@ export default function ProductBottleScroll({
                 Math.floor(scrollProgress * totalFrames)
             );
 
+            // Skip render if frame hasn't changed (frame caching)
+            if (frameIndex === lastFrameRef.current) return;
+            lastFrameRef.current = frameIndex;
+
             const img = images[frameIndex];
             if (img && img.complete) {
-                // Responsive canvas sizing - match window dimensions exactly
-                const scale = window.devicePixelRatio || 1;
-                canvas.width = window.innerWidth * scale;
-                canvas.height = window.innerHeight * scale;
-                ctx.scale(scale, scale);
-
                 // Enable smooth rendering with anti-aliasing
                 ctx.imageSmoothingEnabled = true;
                 ctx.imageSmoothingQuality = 'high';
@@ -77,8 +106,6 @@ export default function ProductBottleScroll({
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
 
                 // Calculate to cover entire viewport with no black bars
-                const canvasWidth = window.innerWidth;
-                const canvasHeight = window.innerHeight;
                 const imgAspect = img.width / img.height;
                 const canvasAspect = canvasWidth / canvasHeight;
 
@@ -107,7 +134,8 @@ export default function ProductBottleScroll({
             requestAnimationFrame(render);
         };
 
-        window.addEventListener("scroll", handleScroll);
+        // Passive listener tells browser we won't preventDefault
+        window.addEventListener("scroll", handleScroll, { passive: true });
         handleScroll(); // Initial render
 
         return () => window.removeEventListener("scroll", handleScroll);
@@ -127,7 +155,11 @@ export default function ProductBottleScroll({
                 <canvas
                     ref={canvasRef}
                     className="absolute inset-0 w-full h-full"
-                    style={{ opacity: imagesLoaded ? 1 : 0, transition: "opacity 0.5s" }}
+                    style={{
+                        opacity: imagesLoaded ? 1 : 0,
+                        transition: "opacity 0.5s",
+                        willChange: "transform" // GPU acceleration hint
+                    }}
                 />
             </div>
         </div>

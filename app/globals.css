@@ -38,6 +38,12 @@ html {
   scroll-behavior: smooth;
 }
 
+/* Performance optimization: reduce layout thrashing during scroll */
+* {
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
 @layer utilities {
   .text-balance {
     text-wrap: balance;
